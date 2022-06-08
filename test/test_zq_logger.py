@@ -1,6 +1,5 @@
-from logger import *
 
-
+from zq_tools.zq_logger import *
 if __name__ == '__main__':
     import logging
     # show colors
