@@ -10,4 +10,5 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.3.1: add install dependencies
 - 0.3.0: output `pathname` instead of `filename`, better support for IDE's jumping function
