@@ -2,6 +2,9 @@ import json
 import time
 import os
 import threading
+from typing import Union
+
+# json format: https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/
 
 __all__ = [
     "get_pid", "get_tid",
@@ -13,7 +16,9 @@ __all__ = [
     "record_process_name",
     "record_process_sort_index",
     "record_thread_sort_index",
-    "record_dump"
+    "record_dump",
+    "record_begin_async",
+    "record_end_async"
 ]
 
 contents = []
@@ -53,6 +58,26 @@ def record_end(name:str,
                **kwargs):
     j = record_timestamp(name, cat, **kwargs)
     j['ph'] = "E"
+    contents.append(json.dumps(j))
+    
+def record_begin_async(name:str,
+                       id:Union[str,int],
+                       cat:str="",
+                       **kwargs
+                       ):
+    j = record_timestamp(name, cat, **kwargs)
+    j['ph'] = 'b'
+    j['id'] = id
+    contents.append(json.dumps(j))
+    
+def record_end_async(name:str,
+                       id:Union[str,int],
+                       cat:str="",
+                       **kwargs
+                       ):
+    j = record_timestamp(name, cat, **kwargs)
+    j['ph'] = 'e'
+    j['id'] = id
     contents.append(json.dumps(j))
 
 def record_duration(name:str,

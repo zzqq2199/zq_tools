@@ -10,5 +10,6 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.3.2: add async record, support nested and ordered tracing events
 - 0.3.1: add install dependencies
 - 0.3.0: output `pathname` instead of `filename`, better support for IDE's jumping function
