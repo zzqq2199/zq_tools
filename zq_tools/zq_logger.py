@@ -11,7 +11,7 @@ console_color_config = {
     'CRITICAL': 'bold_red',
 }
 
-fmt = '[%(asctime)s.%(msecs)03d] %(filename)s line:%(lineno)d [%(levelname)s] : %(message)s'
+fmt = '[%(asctime)s.%(msecs)03d] "%(pathname)s", line %(lineno)d [%(levelname)s] : %(message)s'
 color_fmt = f'%(log_color)s{fmt}'
 date_fmt = "%Y-%m-%d %H:%M:%S"
 

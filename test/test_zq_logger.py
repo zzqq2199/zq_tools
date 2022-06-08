@@ -1,6 +1,7 @@
 
 from zq_tools.zq_logger import *
-if __name__ == '__main__':
+
+def main():
     import logging
     # show colors
     logger = logging.getLogger(__name__)
@@ -16,7 +17,6 @@ if __name__ == '__main__':
     logger.critical("critical")
     print()
 
-
     # test functions
     logger = get_logger()
     logger.debug("debug")
@@ -24,3 +24,6 @@ if __name__ == '__main__':
     logger.warning("warning")
     logger.error("error")
     logger.critical("critical")
+    
+if __name__ == '__main__':
+    main()
