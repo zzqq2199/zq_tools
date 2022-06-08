@@ -18,12 +18,11 @@ def main():
     print()
 
     # test functions
-    logger = get_logger()
-    logger.debug("debug")
-    logger.info("info")
-    logger.warning("warning")
-    logger.error("error")
-    logger.critical("critical")
+    get_logger().debug("debug")
+    get_logger().info("info")
+    get_logger().warning("warning")
+    get_logger().error("error")
+    get_logger().critical("critical")
     
 if __name__ == '__main__':
     main()

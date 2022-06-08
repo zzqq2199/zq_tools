@@ -15,6 +15,7 @@ fmt = '[%(asctime)s.%(msecs)03d] "%(pathname)s", line %(lineno)d [%(levelname)s]
 color_fmt = f'%(log_color)s{fmt}'
 date_fmt = "%Y-%m-%d %H:%M:%S"
 
+
 def get_file_handler(log_path = "./log.txt")->logging.FileHandler :
     file_formatter = logging.Formatter(
         fmt = fmt,
@@ -37,10 +38,16 @@ def get_stream_handler()->logging.StreamHandler:
     handler.setFormatter(console_formatter)
     return handler
 
+default_logger = logging.getLogger("zq_logger")
+default_logger.setLevel(logging.DEBUG)
+default_logger.addHandler(get_file_handler("./zq_logger.log"))
+default_logger.addHandler(get_stream_handler())
+
 def get_logger(logger_name="zq_logger",
-               log_path = "./log.txt",
+               log_path = "./zq_logger.log",
                enable_file = True,
                enable_console = True):
+    if logger_name=="zq_logger": return default_logger
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
     if not logger.handlers:
@@ -49,7 +56,6 @@ def get_logger(logger_name="zq_logger",
         if enable_console:
             logger.addHandler(get_stream_handler())
     return logger
-
 
 
 if __name__ == '__main__':
