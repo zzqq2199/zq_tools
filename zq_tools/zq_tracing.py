@@ -149,4 +149,4 @@ if __name__ == '__main__':
         time.sleep(0.5)
     record_thread_name(name="thread")
     record_process_name(name="process")
-    record_dump("./togo/test.json")
+    record_dump("./test.json")

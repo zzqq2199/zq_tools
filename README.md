@@ -10,6 +10,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.3.4: fix bug
 - 0.3.3: add default logger, call `zq_logger.get_logger()`, return a pre-defined logger
 - 0.3.2: add async record, support nested and ordered tracing events
 - 0.3.1: add install dependencies
