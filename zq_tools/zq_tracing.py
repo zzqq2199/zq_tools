@@ -34,13 +34,15 @@ def get_tid():
 
 def record_timestamp(name:str,
                  cat:str,
+                 tid:int,
+                 pid:int,
                  **kwargs) -> None:
     j = {
         "name":name,
         "cat":cat,
-        "ts": time.time()*1000,
-        "pid": get_pid(),
-        "tid": get_tid()
+        "ts": time.time()*1000000,
+        "pid": get_pid() if pid<0 else pid,
+        "tid": get_tid() if tid<0 else tid
     }
     if kwargs:
         j["args"] = kwargs
@@ -48,24 +50,30 @@ def record_timestamp(name:str,
 
 def record_begin(name:str,
                  cat:str="",
+                 tid=-1,
+                 pid=-1,
                  **kwargs):
-    j = record_timestamp(name, cat, **kwargs)
+    j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = "B"
     contents.append(json.dumps(j))
 
 def record_end(name:str,
                cat:str="",
+               tid=-1,
+               pid=-1,
                **kwargs):
-    j = record_timestamp(name, cat, **kwargs)
+    j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = "E"
     contents.append(json.dumps(j))
     
 def record_begin_async(name:str,
                        id:Union[str,int],
                        cat:str="",
+                       tid=-1,
+                       pid=-1,
                        **kwargs
                        ):
-    j = record_timestamp(name, cat, **kwargs)
+    j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = 'b'
     j['id'] = id
     contents.append(json.dumps(j))
@@ -73,59 +81,63 @@ def record_begin_async(name:str,
 def record_end_async(name:str,
                        id:Union[str,int],
                        cat:str="",
+                       tid=-1,
+                       pid=-1,
                        **kwargs
                        ):
-    j = record_timestamp(name, cat, **kwargs)
+    j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = 'e'
     j['id'] = id
     contents.append(json.dumps(j))
 
 def record_duration(name:str,
                     cat:str="",
+                    tid=-1,
+                    pid=-1,
                     dur:float=0,
                     **kwargs):
-    j = record_timestamp(name, cat, **kwargs)
+    j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = "X"
     j['dur'] = dur  
     contents.append(json.dumps(j))
     
-def record_thread_name(name:str, **kwargs):
+def record_thread_name(name:str, tid=-1, pid=-1, **kwargs):
     j = {
         "name": "thread_name",
         "ph": "M",
-        "pid": get_pid(),
-        "tid": get_tid(),
+        "pid": get_pid() if pid<0 else pid,
+        "tid": get_tid() if tid<0 else tid,
     }
     kwargs['name'] = name
     j['args'] = kwargs
     contents.append(json.dumps(j))
 
-def record_process_name(name:str, **kwargs):
+def record_process_name(name:str, pid=-1, **kwargs):
     j = {
         "name": "process_name",
         'ph': 'M',
-        'pid': get_pid(),
+        'pid': get_pid() if pid<0 else pid,
     }
     kwargs['name'] = name
     j['args'] = kwargs
     contents.append(json.dumps(j))
     
-def record_process_sort_index(index:int, **kwargs):
+def record_process_sort_index(index:int, pid=-1, **kwargs):
     j = {
         'name': 'process_sort_index',
         'ph': 'M',
-        'pid': get_pid(),
+        'pid': get_pid() if pid<0 else pid,
     }
     kwargs['sort_index'] = index
     j['args'] = kwargs
     contents.append(json.dumps(j))
 
-def record_thread_sort_index(index:int, **kwargs):
+def record_thread_sort_index(index:int, tid=-1, pid=-1, **kwargs):
     j = {
         'name': 'thread_sort_index',
         'ph': 'M',
-        'pid': get_pid(),
-        'tid': get_tid(),
+        'pid': get_pid() if pid<0 else pid,
+        'tid': get_tid() if tid<0 else tid,
     }
     kwargs['sort_index'] = index
     j['args'] = kwargs
@@ -138,7 +150,7 @@ def record_dump(filename:str):
         f.write(",\n".join(contents))
         f.write("\n]\n")
         
-        
+         
         
 if __name__ == '__main__':
     for i in range(2):
@@ -149,4 +161,4 @@ if __name__ == '__main__':
         time.sleep(0.5)
     record_thread_name(name="thread")
     record_process_name(name="process")
-    record_dump("./test.json")
+    record_dump("./togo/test.json")
