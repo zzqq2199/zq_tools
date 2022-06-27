@@ -10,6 +10,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.5.5: disable color by default for `print` and `print_all`
 - 0.5.3: zq_logger supports `print`, `print_all`, `set_rank`
 - 0.5.1: move tag to ahead of msg
 - 0.5.0: zq_logger supports color API, add tag

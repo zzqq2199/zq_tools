@@ -44,12 +44,18 @@ class ZQ_Logger(logging.Logger):
         self.reset_format()
         return self
     
-    def print(self, msg:str, color:str='white',*args, **kwargs):
-        color = getattr(cf, color)
-        self._log(999, color(msg), args, **kwargs)
-    def print_root(self, msg:str, color:str='white', root=0, *args, **kwargs):
-        color = getattr(cf, color)
-        if self.rank == root:
+    def print(self, msg:str, color:str='',*args, **kwargs):
+        if color:
+            color = getattr(cf, color)
+            self._log(999, color(msg), args, **kwargs)
+        else:
+            self._log(999, msg, args, **kwargs)
+    def print_root(self, msg:str, color:str='', root=0, *args, **kwargs):
+        if self.rank != root: return
+        if color:
+            color = getattr(cf, color)
+            self._log(999, color(msg), args, **kwargs)
+        else:
             self._log(999, color(msg), args, **kwargs)
     def debug(self, msg:str, *args, **kwargs):
         self._log(logging.DEBUG, msg, args, kwargs)
