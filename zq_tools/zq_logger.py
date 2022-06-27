@@ -10,17 +10,23 @@ class ZQ_Logger(logging.Logger):
         self.tag = ""
         self.print_thread = False
         self.print_level = True
+        self.rank = 0
         
     def generate_fmt(self)->logging.StreamHandler:
         thread_fmt = "" if not self.print_thread else "[%(threadName)s] "
         level_fmt = "" if not self.print_level else " [%(levelname)s]"
-        basic_fmt = f'{self.tag}[%(asctime)s.%(msecs)03d] {thread_fmt}"%(pathname)s", line %(lineno)d{level_fmt}: %(message)s'
+        basic_fmt = f'[%(asctime)s.%(msecs)03d] {thread_fmt}"%(pathname)s", line %(lineno)d{level_fmt}:{self.tag} %(message)s'
         date_fmt = "%Y-%m-%d %H:%M:%S"
         fmt = logging.Formatter(
             fmt = basic_fmt,
             datefmt = date_fmt
         )
         return fmt
+    
+    def set_rank(self, rank:int):
+        self.rank = rank
+        self._set_tag(f"[Rank {rank}]")
+        return self
         
     def reset_format(self):
         formatter = self.generate_fmt()
@@ -28,7 +34,7 @@ class ZQ_Logger(logging.Logger):
             handler.setFormatter(formatter)
         return self
             
-    def set_tag(self, tag:str):
+    def _set_tag(self, tag:str):
         self.tag = tag
         self.reset_format()
         return self
@@ -38,9 +44,13 @@ class ZQ_Logger(logging.Logger):
         self.reset_format()
         return self
     
-    def color(self, msg:str, color:str='white',*args, **kwargs):
+    def print(self, msg:str, color:str='white',*args, **kwargs):
         color = getattr(cf, color)
         self._log(999, color(msg), args, **kwargs)
+    def print_root(self, msg:str, color:str='white', root=0, *args, **kwargs):
+        color = getattr(cf, color)
+        if self.rank == root:
+            self._log(999, color(msg), args, **kwargs)
     def debug(self, msg:str, *args, **kwargs):
         self._log(logging.DEBUG, msg, args, kwargs)
     def info(self, msg:str, *args, **kwargs):
@@ -73,7 +83,8 @@ if __name__ == '__main__':
     # test functions
     logger1 = get_logger()
     logger1.set_print_thread()
-    logger1.set_tag("[TAG]")
+    # logger1._set_tag("[TAG]")
+    logger1.set_rank(1)
     logger2 = get_logger()
     logger3 = get_logger("another logger")
     logger2.debug("debug")
@@ -82,5 +93,9 @@ if __name__ == '__main__':
     logger2.error("error")
     logger2.critical("critical")
     logger2.fatal("fatal")
-    logger3.color("msg", "italic_red")
+    logger3.print("msg", "italic_red")
+    logger1.print("msg", "bold_yellow")
+    logger1.print_root("this msg cannot be printed", "italic_yellow")
+    logger1.print_root("this msg can be printed", "italic_bold_blue", root=1)
+    
     

@@ -1,3 +1,3 @@
-bash scripts/clean.sh
+fbash scripts/clean.sh
 bash scripts/build.sh
 twine upload dist/*
