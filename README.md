@@ -10,6 +10,8 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.5.0: zq_logger supports color API, add tag
+- 0.4.1: fix bug of zq_cycle
 - 0.4.0: add zq_cycle
 - 0.3.6: default unit of timestamp: us
 - 0.3.5: support manually specifiying tid/pid when calling `zq_tracing.record_*`
