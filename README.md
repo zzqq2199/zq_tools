@@ -10,6 +10,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.4.0: add zq_cycle
 - 0.3.6: default unit of timestamp: us
 - 0.3.5: support manually specifiying tid/pid when calling `zq_tracing.record_*`
 - 0.3.4: fix bug
