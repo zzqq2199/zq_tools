@@ -56,7 +56,7 @@ class ZQ_Logger(logging.Logger):
             color = getattr(cf, color)
             self._log(999, color(msg), args, **kwargs)
         else:
-            self._log(999, color(msg), args, **kwargs)
+            self._log(999, msg, args, **kwargs)
     def debug(self, msg:str, *args, **kwargs):
         self._log(logging.DEBUG, msg, args, kwargs)
     def info(self, msg:str, *args, **kwargs):
