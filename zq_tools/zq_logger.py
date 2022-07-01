@@ -5,16 +5,24 @@ __all__ = ["get_logger"]
 allocated_loggers = {}
 
 class ZQ_Logger(logging.Logger):
+    DEBUG=logging.DEBUG
+    INFO=logging.INFO
+    WARN=logging.WARN
+    WARNING=logging.WARNING
+    FATAL=logging.FATAL
+    CRITICAL=logging.CRITICAL
+    PRANK = 999
+    
     def default_color(self, x): return x
     color_to_rank = [
-        cf.red,
-        cf.yellow,
-        cf.blue,
-        cf.cyan,
-        cf.green,
-        cf.magenta,
-        cf.orange,
-        cf.purple
+        cf.italic_red,
+        cf.italic_yellow,
+        cf.italic_cyan,
+        cf.italic_orange,
+        cf.italic_blue,
+        cf.italic_magenta,
+        cf.italic_green,
+        cf.italic_purple,
     ]
     def __init__(self, name):
         super(ZQ_Logger, self).__init__(name)
@@ -22,7 +30,6 @@ class ZQ_Logger(logging.Logger):
         self.print_thread = False
         self.print_level = True
         self.rank = 0
-        self.level_of_prank = (logging.DEBUG+logging.INFO)//2
         
     def generate_fmt(self)->logging.StreamHandler:
         thread_fmt = "" if not self.print_thread else "[%(threadName)s] "
@@ -60,11 +67,14 @@ class ZQ_Logger(logging.Logger):
     
     def prank(self, msg:str, color:str='',*args, **kwargs):
         '''print with rank. If color is not specified, use the color format corresponding to the rank'''
-        if not self.isEnabledFor(logging.DEBUG): return
+        if not self.isEnabledFor(self.PRANK): return
         color = getattr(cf, color) if color else self.default_color
-        self._log(self.level_of_prank, color(msg), args, **kwargs)
-    def debug(self, msg:str, *args, **kwargs):
-        if self.isEnabledFor(logging.DEBUG): self._log(logging.DEBUG, msg, args, kwargs)
+        self._log(self.PRANK, color(msg), args, **kwargs)
+    def debug(self, msg:str, color:str='',*args, **kwargs):
+        '''print with rank. If color is not specified, use the color format corresponding to the rank'''
+        if not self.isEnabledFor(self.DEBUG): return
+        color = getattr(cf, color) if color else self.default_color
+        self._log(self.DEBUG, color(msg), args, **kwargs)
     def info(self, msg:str, *args, **kwargs):
         if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, kwargs)
     def warn(self, msg:str, *args, **kwargs):
@@ -77,12 +87,15 @@ class ZQ_Logger(logging.Logger):
     def prank_root(self, msg:str, color:str='', root=0, *args, **kwargs):
         '''print with rank. If color is not specified, use the color format corresponding to the rank'''
         if self.rank != root: return
-        if not self.isEnabledFor(logging.DEBUG): return
+        if not self.isEnabledFor(self.PRANK): return
         color = getattr(cf, color) if color else self.default_color
-        self._log(self.level_of_prank, color(msg), args, **kwargs)
-    def debug_root(self, msg:str, root=0, *args, **kwargs):
+        self._log(self.PRANK, color(msg), args, **kwargs)
+    def debug_root(self, msg:str, color:str='', root=0, *args, **kwargs):
+        '''print with rank. If color is not specified, use the color format corresponding to the rank'''
         if self.rank != root: return
-        if self.isEnabledFor(logging.DEBUG): self._log(logging.DEBUG, msg, args, kwargs)
+        if not self.isEnabledFor(self.DEBUG): return
+        color = getattr(cf, color) if color else self.default_color
+        self._log(self.DEBUG, color(msg), args, **kwargs)
     def info_root(self, msg:str, root=0, *args, **kwargs):
         if self.rank != root: return
         if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, kwargs)
@@ -98,6 +111,10 @@ class ZQ_Logger(logging.Logger):
         
     warning = warn
     critical = fatal
+    warning_root = warn_root
+    critical_root = fatal_root
+    
+    
 
 def get_logger(logger_name="zq_logger",
                log_path = "",
@@ -115,23 +132,31 @@ def get_logger(logger_name="zq_logger",
 
 if __name__ == '__main__':
     # test functions
-    logger1 = get_logger()
-    logger1.set_print_thread()
-    # logger1._set_tag("[TAG]")
-    logger1.prank_root("this msg can be printed", root=0)
-    logger1.set_rank(1)
-    logger2 = get_logger()
-    logger3 = get_logger("another logger")
-    logger2.debug("debug")
-    logger2.info("info")
-    logger2.warning("warning")
-    logger2.error("error")
-    logger2.critical("critical")
-    logger2.fatal("fatal")
-    logger3.prank("msg", "italic_red")
-    logger1.prank("msg", "bold_yellow")
-    logger1.prank_root("this msg cannot be printed", "italic_yellow")
-    logger1.prank_root("this msg can be printed", "italic_bold_blue", root=1)
-    logger1.prank_root("this msg can be printed", root=1)
+    logger = get_logger(log_path="./test_log.txt")
+    logger.debug("default style of `debug` msg")
+    logger.debug("if rank is not set, `debug` print with no color")
+    logger.debug_root("if rank is not set, `debug_root` also print with no color")
+    logger.set_rank(1)
+    logger.debug("after rank is set, `debug` print with color corresponding to different rank, and the words are italicized")
+    logger.debug_root(f"default root is 0, so this message can not be displayed")
+    logger.debug_root(f"`debug_root` print if passed param `root` matches `self.rank`", root=1)
+    logger.setLevel(logger.FATAL)
+    logger.debug("this message cannot be displayed")
+    logger.prank(f"`prank` and `prank_root` behaves simalr with `debug` and `debug_root`, but `prank*` have highest priority(999)")
+
+    logger.setLevel(logger.DEBUG)
+    for rank in range(8):
+        logger.set_rank(rank)
+        logger.debug(f"style of rank {rank}")
+
+    logger.info("style of info msg (green)")
+    logger.warn("style of warn msg (yellow)")
+    logger.error("style of error msg (red) ")
+    logger.fatal("style of fatal msg (bold red)")
+    
+    logger.set_print_thread(print_thread=True)
+    logger.info("After `set_print_thread`, the info msg will be printed with thread id")
+    
+    
     
     

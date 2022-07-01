@@ -1,7 +1,9 @@
 # zq_logger
 generates a logger, preformatted with the file name, line number information, differrent levels of color, and can be output in the console and written to a file at the same time.
 
-![](https://raw.githubusercontent.com/zzqq2199/pic_for_public/master/img/20220608140039.png)
+![](https://raw.githubusercontent.com/zzqq2199/pic_for_public/master/img/20220701162735.png)
+
+If you use vscode to view the output log in the editor, `ANSI Colors` extension is recommended to install.
 
 # zq_tracing
 help generate json file used in `chrome://tracing`
@@ -10,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.7.0: re-think the color print logic
 - 0.6.0: rename function: logger.print* --> logger.prank*
 - 0.5.9: set level of print bewteen DEBUG and INFO, add `*_root` functions
 - 0.5.8: implement `__len__` and `__iter__` for zq_cycle
@@ -27,3 +30,7 @@ help generate json file used in `chrome://tracing`
 - 0.3.2: add async record, support nested and ordered tracing events
 - 0.3.1: add install dependencies
 - 0.3.0: output `pathname` instead of `filename`, better support for IDE's jumping function
+
+
+# TODO:
+- add setLogPath()
