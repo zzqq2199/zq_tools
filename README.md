@@ -10,6 +10,8 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.6.0: rename function: logger.print* --> logger.prank*
+- 0.5.9: set level of print bewteen DEBUG and INFO, add `*_root` functions
 - 0.5.8: implement `__len__` and `__iter__` for zq_cycle
 - 0.5.6: add colors for different rank. add filter for zq_logger
 - 0.5.5: disable color by default for `print` and `print_all`

@@ -22,6 +22,7 @@ class ZQ_Logger(logging.Logger):
         self.print_thread = False
         self.print_level = True
         self.rank = 0
+        self.level_of_prank = (logging.DEBUG+logging.INFO)//2
         
     def generate_fmt(self)->logging.StreamHandler:
         thread_fmt = "" if not self.print_thread else "[%(threadName)s] "
@@ -57,14 +58,11 @@ class ZQ_Logger(logging.Logger):
         self.reset_format()
         return self
     
-    def print(self, msg:str, color:str='',*args, **kwargs):
+    def prank(self, msg:str, color:str='',*args, **kwargs):
+        '''print with rank. If color is not specified, use the color format corresponding to the rank'''
         if not self.isEnabledFor(logging.DEBUG): return
         color = getattr(cf, color) if color else self.default_color
-        self._log(999, color(msg), args, **kwargs)
-    def print_root(self, msg:str, color:str='', root=0, *args, **kwargs):
-        if self.rank != root: return
-        color = getattr(cf, color) if color else self.default_color
-        self._log(999, color(msg), args, **kwargs)
+        self._log(self.level_of_prank, color(msg), args, **kwargs)
     def debug(self, msg:str, *args, **kwargs):
         if self.isEnabledFor(logging.DEBUG): self._log(logging.DEBUG, msg, args, kwargs)
     def info(self, msg:str, *args, **kwargs):
@@ -74,6 +72,28 @@ class ZQ_Logger(logging.Logger):
     def error(self, msg:str, *args, **kwargs):
         if self.isEnabledFor(logging.ERROR): self._log(logging.ERROR, cf.red(msg), args, kwargs)
     def fatal(self, msg:str, *args, **kwargs):
+        if self.isEnabledFor(logging.FATAL): self._log(logging.FATAL, cf.bold_red(msg), args, kwargs)
+
+    def prank_root(self, msg:str, color:str='', root=0, *args, **kwargs):
+        '''print with rank. If color is not specified, use the color format corresponding to the rank'''
+        if self.rank != root: return
+        if not self.isEnabledFor(logging.DEBUG): return
+        color = getattr(cf, color) if color else self.default_color
+        self._log(self.level_of_prank, color(msg), args, **kwargs)
+    def debug_root(self, msg:str, root=0, *args, **kwargs):
+        if self.rank != root: return
+        if self.isEnabledFor(logging.DEBUG): self._log(logging.DEBUG, msg, args, kwargs)
+    def info_root(self, msg:str, root=0, *args, **kwargs):
+        if self.rank != root: return
+        if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, kwargs)
+    def warn_root(self, msg:str, root=0, *args, **kwargs):
+        if self.rank != root: return
+        if self.isEnabledFor(logging.WARN): self._log(logging.WARN, cf.yellow(msg), args, kwargs)
+    def error_root(self, msg:str, root=0, *args, **kwargs):
+        if self.rank != root: return
+        if self.isEnabledFor(logging.ERROR): self._log(logging.ERROR, cf.red(msg), args, kwargs)
+    def fatal_root(self, msg:str, root=0, *args, **kwargs):
+        if self.rank != root: return
         if self.isEnabledFor(logging.FATAL): self._log(logging.FATAL, cf.bold_red(msg), args, kwargs)
         
     warning = warn
@@ -98,7 +118,7 @@ if __name__ == '__main__':
     logger1 = get_logger()
     logger1.set_print_thread()
     # logger1._set_tag("[TAG]")
-    logger1.print_root("this msg can be printed", root=0)
+    logger1.prank_root("this msg can be printed", root=0)
     logger1.set_rank(1)
     logger2 = get_logger()
     logger3 = get_logger("another logger")
@@ -108,10 +128,10 @@ if __name__ == '__main__':
     logger2.error("error")
     logger2.critical("critical")
     logger2.fatal("fatal")
-    logger3.print("msg", "italic_red")
-    logger1.print("msg", "bold_yellow")
-    logger1.print_root("this msg cannot be printed", "italic_yellow")
-    logger1.print_root("this msg can be printed", "italic_bold_blue", root=1)
-    logger1.print_root("this msg can be printed", root=1)
+    logger3.prank("msg", "italic_red")
+    logger1.prank("msg", "bold_yellow")
+    logger1.prank_root("this msg cannot be printed", "italic_yellow")
+    logger1.prank_root("this msg can be printed", "italic_bold_blue", root=1)
+    logger1.prank_root("this msg can be printed", root=1)
     
     
