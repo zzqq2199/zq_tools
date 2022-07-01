@@ -1,7 +1,7 @@
 import logging
 import colorful as cf
 
-__all__ = ["get_logger"]
+__all__ = ["get_logger", "default_logger"]
 allocated_loggers = {}
 
 class ZQ_Logger(logging.Logger):
@@ -135,6 +135,9 @@ def get_logger(logger_name="zq_logger",
     logger.reset_format()
     allocated_loggers[logger_name] = logger
     return logger
+
+default_logger = get_logger()
+
 
 if __name__ == '__main__':
     # test functions
