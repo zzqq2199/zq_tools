@@ -3,3 +3,4 @@ dist/
 *.egg-info
 *.pyc
 zq_tools/test.json
+*.log

@@ -30,6 +30,15 @@ class ZQ_Logger(logging.Logger):
         self.print_thread = False
         self.print_level = True
         self.rank = 0
+        self.log_files = dict()
+        
+    def add_log_file(self, log_file:str):
+        if log_file in self.log_files: return
+        handler = logging.FileHandler(log_file)
+        self.log_files[log_file] = handler
+        logger.addHandler(handler)
+        self.reset_format()
+        
         
     def generate_fmt(self)->logging.StreamHandler:
         thread_fmt = "" if not self.print_thread else "[%(threadName)s] "
@@ -117,13 +126,10 @@ class ZQ_Logger(logging.Logger):
     
 
 def get_logger(logger_name="zq_logger",
-               log_path = "",
                enable_console = True)->ZQ_Logger:
     if logger_name in allocated_loggers: return allocated_loggers[logger_name]
     logger = ZQ_Logger(logger_name)
     logger.setLevel(logging.DEBUG)
-    if log_path:
-        logger.addHandler(logging.FileHandler(log_path))
     if enable_console:
         logger.addHandler(logging.StreamHandler())
     logger.reset_format()
@@ -132,7 +138,9 @@ def get_logger(logger_name="zq_logger",
 
 if __name__ == '__main__':
     # test functions
-    logger = get_logger(log_path="./test_log.txt")
+    logger = get_logger("My Logger")
+    # recommend to use `ANSI Color` in VSCode
+    logger.add_log_file("demo.log")
     logger.debug("default style of `debug` msg")
     logger.debug("if rank is not set, `debug` print with no color")
     logger.debug_root("if rank is not set, `debug_root` also print with no color")
