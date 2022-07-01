@@ -36,7 +36,7 @@ class ZQ_Logger(logging.Logger):
         if log_file in self.log_files: return
         handler = logging.FileHandler(log_file)
         self.log_files[log_file] = handler
-        logger.addHandler(handler)
+        self.addHandler(handler)
         self.reset_format()
         
         
@@ -138,32 +138,32 @@ def get_logger(logger_name="zq_logger",
 
 if __name__ == '__main__':
     # test functions
-    logger = get_logger("My Logger")
+    demo_logger = get_logger("My Logger")
     # recommend to use `ANSI Color` in VSCode
-    logger.add_log_file("demo.log")
-    logger.debug("default style of `debug` msg")
-    logger.debug("if rank is not set, `debug` print with no color")
-    logger.debug_root("if rank is not set, `debug_root` also print with no color")
-    logger.set_rank(1)
-    logger.debug("after rank is set, `debug` print with color corresponding to different rank, and the words are italicized")
-    logger.debug_root(f"default root is 0, so this message can not be displayed")
-    logger.debug_root(f"`debug_root` print if passed param `root` matches `self.rank`", root=1)
-    logger.setLevel(logger.FATAL)
-    logger.debug("this message cannot be displayed")
-    logger.prank(f"`prank` and `prank_root` behaves simalr with `debug` and `debug_root`, but `prank*` have highest priority(999)")
+    demo_logger.add_log_file("demo.log")
+    demo_logger.debug("default style of `debug` msg")
+    demo_logger.debug("if rank is not set, `debug` print with no color")
+    demo_logger.debug_root("if rank is not set, `debug_root` also print with no color")
+    demo_logger.set_rank(1)
+    demo_logger.debug("after rank is set, `debug` print with color corresponding to different rank, and the words are italicized")
+    demo_logger.debug_root(f"default root is 0, so this message can not be displayed")
+    demo_logger.debug_root(f"`debug_root` print if passed param `root` matches `self.rank`", root=1)
+    demo_logger.setLevel(demo_logger.FATAL)
+    demo_logger.debug("this message cannot be displayed")
+    demo_logger.prank(f"`prank` and `prank_root` behaves simalr with `debug` and `debug_root`, but `prank*` have highest priority(999)")
 
-    logger.setLevel(logger.DEBUG)
+    demo_logger.setLevel(demo_logger.DEBUG)
     for rank in range(8):
-        logger.set_rank(rank)
-        logger.debug(f"style of rank {rank}")
+        demo_logger.set_rank(rank)
+        demo_logger.debug(f"style of rank {rank}")
 
-    logger.info("style of info msg (green)")
-    logger.warn("style of warn msg (yellow)")
-    logger.error("style of error msg (red) ")
-    logger.fatal("style of fatal msg (bold red)")
+    demo_logger.info("style of info msg (green)")
+    demo_logger.warn("style of warn msg (yellow)")
+    demo_logger.error("style of error msg (red) ")
+    demo_logger.fatal("style of fatal msg (bold red)")
     
-    logger.set_print_thread(print_thread=True)
-    logger.info("After `set_print_thread`, the info msg will be printed with thread id")
+    demo_logger.set_print_thread(print_thread=True)
+    demo_logger.info("After `set_print_thread`, the info msg will be printed with thread id")
     
     
     
