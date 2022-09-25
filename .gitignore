@@ -4,3 +4,4 @@ dist/
 *.pyc
 zq_tools/test.json
 *.log
+scripts/upload_with_password.sh
