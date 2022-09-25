@@ -12,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.8.4: fix bug, add `colorful` to dependency
 - 0.8.3: add `zq_files`
 - 0.8.2: support `from zq_tools.zq_logger import default_logger as logger`
 - 0.8.0: use `add_log_file` to add a log file to the logger.

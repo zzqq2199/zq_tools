@@ -5,7 +5,7 @@ with open("README.md", 'r') as f:
 
 setuptools.setup(
     name="zq-tools",
-    version="0.8.3",
+    version="0.8.4",
     author="zzqq2199",
     author_email="zhouquanjs@qq.com",
     description="A collection of tools for zzqq2199",
@@ -18,6 +18,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "colorlog == 6.6"
+        "colorlog >= 6.6",
+        "colorful"
     ]
 )
