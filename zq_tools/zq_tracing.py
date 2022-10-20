@@ -17,11 +17,20 @@ __all__ = [
     "record_process_sort_index",
     "record_thread_sort_index",
     "record_dump",
+    "record_init",
+    "record_append",
     "record_begin_async",
-    "record_end_async"
+    "record_end_async",
+    "set_start_timestamp"
 ]
 
 contents = []
+start_timestamp = 0
+
+def set_start_timestamp():
+    global start_timestamp
+    start_timestamp = time.time()
+
 
 def get_pid():
     return os.getpid()
@@ -37,10 +46,11 @@ def record_timestamp(name:str,
                  tid:int,
                  pid:int,
                  **kwargs) -> None:
+    global start_timestamp
     j = {
         "name":name,
         "cat":cat,
-        "ts": time.time()*1000000,
+        "ts": (time.time()-start_timestamp)*1000000,
         "pid": get_pid() if pid<0 else pid,
         "tid": get_tid() if tid<0 else tid
     }
@@ -145,10 +155,19 @@ def record_thread_sort_index(index:int, tid=-1, pid=-1, **kwargs):
 
 def record_dump(filename:str):
     with open(filename, 'w') as f:
-        # f.write(str(contents))
         f.write("[\n")
         f.write(",\n".join(contents))
         f.write("\n]\n")
+
+def record_init(filename:str):
+    with open(filename, 'w') as f:
+        f.write("[\n")
+
+def record_append(filename:str):
+    with open(filename, 'a') as f:
+        for content in contents:
+            f.write(f"{content},\n")
+
         
          
         

@@ -12,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.8.6: add api: `zq_tracing.record_init`, `zq_tracing.record_append`
 - 0.8.5: add api: `zq_tracing.set_start_timestamp`
 - 0.8.4: fix bug, add `colorful` to dependency
 - 0.8.3: add `zq_files`
