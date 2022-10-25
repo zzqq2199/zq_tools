@@ -12,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.9.0: add decorator and manager: `zq_decorator.timeit`
 - 0.8.8: add decorator: `zq_decorator.do_nothing`
 - 0.8.7: add api: `zq_tracing.enable_trace`, `zq_tracing.disable_trace`
 - 0.8.6: add api: `zq_tracing.record_init`, `zq_tracing.record_append`
