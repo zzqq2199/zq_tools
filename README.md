@@ -12,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 0.9.3: update `zq_decorator:: do_nothing, pass_it, time_it(support sync and self-defined print)`
 - 0.9.2: fix bug: `.zq_logger` to `zq_tools.zq_logger`
 - 0.9.1: use `default_logger` instead of `print`
 - 0.9.0: add decorator and manager: `zq_decorator.timeit`

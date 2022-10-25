@@ -82,35 +82,47 @@ class _DecoratorContextManager:
         # override this method if your children class takes __init__ parameters
         return self.__class__(*self.args, **self.kwargs)
 
-def do_nothing(func):
-    def inner(*args, **kwargs):
-        return
-    return inner
+def do_nothing(*args, **kwargs): 
+    pass
 
-class timeit(_DecoratorContextManager):
-    def __init__(self, keyword=""):
-        super().__init__(keyword=keyword)
+def pass_it(func): # decorator
+    return do_nothing
+
+class time_it(_DecoratorContextManager):
+    def __init__(self, 
+                 keyword="", 
+                 print_it=print, 
+                 sync_func=do_nothing):
+        super().__init__(keyword=keyword, print_it=print_it, sync_func=sync_func)
+        self.print_it = print_it
+        self.sync_func = sync_func
         self.keyword = keyword if keyword=="" else f"[{keyword}] "
     def __enter__(self):
+        self.sync_func()
         self.start_time = time.time()
     def __exit__(self, exc_type: Any, exc_value: Any, traceback:Any):
+        self.sync_func
         self.stop_time = time.time()
-        logger.info(f"{self.keyword}timeit: {self.stop_time-self.start_time}s")
+        self.print_it(f"{self.keyword}time_it: {self.stop_time-self.start_time}s")
 
     
 if __name__ == '__main__':
-    @do_nothing
+    @pass_it
     def test():
         print("hello in test")
     test()
     
-    @timeit(keyword="time it as wrapper")
+    @time_it(keyword="time it as wrapper")
     def test():
         print("hello in decorator")
     test()
     
-    with timeit(keyword="time it as context manager"):
+    with time_it(keyword="time it as context manager"):
         print("hello in `with`")
+
+    from zq_tools.zq_logger import default_logger as logger
+    with time_it(keyword="time it as context manager", print_it=logger.info):
+        print("hello in `with`, print with logger")
     
     
     
