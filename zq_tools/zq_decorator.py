@@ -101,7 +101,7 @@ class time_it(_DecoratorContextManager):
         self.sync_func()
         self.start_time = time.time()
     def __exit__(self, exc_type: Any, exc_value: Any, traceback:Any):
-        self.sync_func
+        self.sync_func()
         self.stop_time = time.time()
         self.print_it(f"{self.keyword}time_it: {self.stop_time-self.start_time}s")
 
