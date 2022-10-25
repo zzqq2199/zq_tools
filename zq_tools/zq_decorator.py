@@ -3,6 +3,7 @@ import sys
 import functools
 import inspect
 from typing import Any, Callable, TypeVar, cast
+from zq_logger import default_logger as logger
 
 # Used for annotating the decorator usage of 'no_grad' and 'enable_grad'.
 # See https://mypy.readthedocs.io/en/latest/generics.html#declaring-decorators
@@ -81,7 +82,6 @@ class _DecoratorContextManager:
         # override this method if your children class takes __init__ parameters
         return self.__class__(*self.args, **self.kwargs)
 
-
 def do_nothing(func):
     def inner(*args, **kwargs):
         return
@@ -91,13 +91,11 @@ class timeit(_DecoratorContextManager):
     def __init__(self, keyword=""):
         super().__init__(keyword=keyword)
         self.keyword = keyword if keyword=="" else f"[{keyword}] "
-        print(f"keyword={self.keyword}")
     def __enter__(self):
         self.start_time = time.time()
     def __exit__(self, exc_type: Any, exc_value: Any, traceback:Any):
         self.stop_time = time.time()
-        print(f"keyword={self.keyword}")
-        print(f"{self.keyword}timeit: {self.stop_time-self.start_time}s")
+        logger.info(f"{self.keyword}timeit: {self.stop_time-self.start_time}s")
 
     
 if __name__ == '__main__':
