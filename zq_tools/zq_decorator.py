@@ -3,7 +3,7 @@ import sys
 import functools
 import inspect
 from typing import Any, Callable, TypeVar, cast
-from zq_logger import default_logger as logger
+from zq_tools.zq_logger import default_logger as logger
 
 # Used for annotating the decorator usage of 'no_grad' and 'enable_grad'.
 # See https://mypy.readthedocs.io/en/latest/generics.html#declaring-decorators
