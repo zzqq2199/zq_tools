@@ -1,5 +1,6 @@
 import logging
 import colorful as cf
+import os
 
 __all__ = ["get_logger", "default_logger"]
 allocated_loggers = {}
@@ -33,6 +34,7 @@ class ZQ_Logger(logging.Logger):
         self.log_files = dict()
         
     def add_log_file(self, log_file:str):
+        # file handler follows same level control behavior as console handler
         if log_file in self.log_files: return
         handler = logging.FileHandler(log_file)
         self.log_files[log_file] = handler
@@ -69,7 +71,6 @@ class ZQ_Logger(logging.Logger):
         return self
 
     def set_print_thread(self, print_thread:bool=True):
-        if not self.isEnabledFor(logging.DEBUG): return
         self.print_thread = print_thread
         self.reset_format()
         return self
@@ -81,9 +82,7 @@ class ZQ_Logger(logging.Logger):
         self._log(self.PRANK, color(msg), args, **kwargs)
     def debug(self, msg:str, color:str='',*args, **kwargs):
         '''print with rank. If color is not specified, use the color format corresponding to the rank'''
-        print(f"try to debug")
         if not self.isEnabledFor(self.DEBUG): return
-        print(f"ok to debug")
         color = getattr(cf, color) if color else self.default_color
         self._log(self.DEBUG, color(msg), args, **kwargs)
     def info(self, msg:str, *args, **kwargs):
@@ -126,21 +125,30 @@ class ZQ_Logger(logging.Logger):
     critical_root = fatal_root
     
 def get_level_from_env(logger_name:str, default_level="info"):
-    import os
-    level=os.environ.get(logger_name, default_level)
-    level=level.lower()
-    if level == "debug": return logging.DEBUG
-    if level == "info": return logging.INFO
-    if level == "warn" or level=="warning": return logging.WARN
-    if level == "error": return logging.ERROR
-    if level == "fatal": return logging.FATAL
+    level = default_level if logger_name not in os.environ else os.environ[logger_name]
+    level2num = {
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warn": logging.WARN,
+        "warning": logging.WARN,
+        "error": logging.ERROR,
+        "fatal": logging.FATAL,
+        "critical": logging.FATAL,
+    }
+    if level in level2num: return level2num[level]
+    print(f"Unknown level {level} for logger {logger_name}, use default level {default_level}")
+    return level2num[default_level]
+
     
     
 
 def get_logger(logger_name="Z_LEVEL",
                enable_console = True)->ZQ_Logger:
     if logger_name in allocated_loggers: return allocated_loggers[logger_name]
-    logger = ZQ_Logger(logger_name)
+    # why need to call `setLoggerClass` twice? refer to the issue: https://bugs.python.org/issue37258
+    logging.setLoggerClass(ZQ_Logger)
+    logger = logging.getLogger(logger_name)
+    logging.setLoggerClass(logging.Logger)
     # Initilize level from environment. If not specified, use INFO
     logger.setLevel(get_level_from_env(logger_name))
     if enable_console:
@@ -153,35 +161,52 @@ default_logger = get_logger()
 
 
 if __name__ == '__main__':
-    # test functions
-    demo_logger = get_logger()
-    # recommend to use `ANSI Color` in VSCode
-    demo_logger.add_log_file("demo.log")
-    demo_logger.debug("default style of `debug` msg")
-    demo_logger.debug("if rank is not set, `debug` print with no color")
-    demo_logger.debug_root("if rank is not set, `debug_root` also print with no color")
-    demo_logger.set_rank(1)
-    demo_logger.debug("after rank is set, `debug` print with color corresponding to different rank, and the words are italicized")
-    demo_logger.debug_root(f"default root is 0, so this message can not be displayed")
-    demo_logger.debug_root(f"`debug_root` print if passed param `root` matches `self.rank`", root=1)
-    demo_logger.setLevel(demo_logger.FATAL)
-    demo_logger.debug("this message cannot be displayed")
-    demo_logger.prank(f"`prank` and `prank_root` behaves simalr with `debug` and `debug_root`, but `prank*` have highest priority(999)")
+    def test_environ():
+        print(f'{"="*20} test environ {"="*20}')
+        logger1 = get_logger("logger1")
+        logger1.debug("this message should not be printed due to default initilizing level is INFO")
+        logger1.setLevel(logger1.DEBUG)
+        logger1.debug("this message should be printed due to call `setLevel`")
+        os.environ['logger2'] = "debug"
+        logger2 = get_logger("logger2")
+        logger2.debug("this message should be printed due to env `logger` is set to `debug`")
+    
+    def test_log_file():
+        print(f'{"="*20} test log file {"="*20}')
+        # recommend to use `ANSI Color` extention to view log file in VSCode
+        logger = get_logger("test_log_file")
+        logger.add_log_file("demo.log")
+        logger.info(f"this message should be printed to both console and file {logger.log_files}")
+        
+    def test_ranks():
+        print(f'{"="*20} test ranks {"="*20}')
+        logger=get_logger("test_ranks")
+        logger.setLevel(logger.DEBUG)
+        logger.debug_root("printed due to default rank is 0 and default style is plain")
+        logger.debug_root("NOT printed due to default rank is 0", root=2)
+        for rank in range(8):
+            logger.set_rank(rank)
+            logger.debug(f"style of rank {rank}")
 
-    print(f"set level to debug")
-    demo_logger.setLevel(demo_logger.DEBUG)
-    for rank in range(8):
-        demo_logger.set_rank(rank)
-        demo_logger.debug(f"style of rank {rank}")
+    def test_styles():
+        print(f'{"="*20} test styles {"="*20}')
+        logger=get_logger("test_styles")
+        logger.info("style of info msg (green)")
+        logger.warn("style of warn msg (yellow)")
+        logger.error("style of error msg (red) ")
+        logger.fatal("style of fatal msg (bold red)")
+    
+    def test_threads():
+        print(f'{"="*20} test threads {"="*20}')
+        logger = get_logger("test_threads")
+        logger.set_print_thread(print_thread=True)
+        logger.info(f"this message should be printed with thread id")
+        
 
-    demo_logger.info("style of info msg (green)")
-    demo_logger.warn("style of warn msg (yellow)")
-    demo_logger.error("style of error msg (red) ")
-    demo_logger.fatal("style of fatal msg (bold red)")
-    
-    demo_logger.set_print_thread(print_thread=True)
-    demo_logger.info("After `set_print_thread`, the info msg will be printed with thread id")
-    
-    
+    test_environ()
+    test_log_file()
+    test_ranks()
+    test_styles()
+    test_threads()
     
     
