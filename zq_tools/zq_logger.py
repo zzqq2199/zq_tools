@@ -81,7 +81,9 @@ class ZQ_Logger(logging.Logger):
         self._log(self.PRANK, color(msg), args, **kwargs)
     def debug(self, msg:str, color:str='',*args, **kwargs):
         '''print with rank. If color is not specified, use the color format corresponding to the rank'''
+        print(f"try to debug")
         if not self.isEnabledFor(self.DEBUG): return
+        print(f"ok to debug")
         color = getattr(cf, color) if color else self.default_color
         self._log(self.DEBUG, color(msg), args, **kwargs)
     def info(self, msg:str, *args, **kwargs):
@@ -123,13 +125,24 @@ class ZQ_Logger(logging.Logger):
     warning_root = warn_root
     critical_root = fatal_root
     
+def get_level_from_env(logger_name:str, default_level="info"):
+    import os
+    level=os.environ.get(logger_name, default_level)
+    level=level.lower()
+    if level == "debug": return logging.DEBUG
+    if level == "info": return logging.INFO
+    if level == "warn" or level=="warning": return logging.WARN
+    if level == "error": return logging.ERROR
+    if level == "fatal": return logging.FATAL
+    
     
 
-def get_logger(logger_name="zq_logger",
+def get_logger(logger_name="Z_LEVEL",
                enable_console = True)->ZQ_Logger:
     if logger_name in allocated_loggers: return allocated_loggers[logger_name]
     logger = ZQ_Logger(logger_name)
-    logger.setLevel(logging.DEBUG)
+    # Initilize level from environment. If not specified, use INFO
+    logger.setLevel(get_level_from_env(logger_name))
     if enable_console:
         logger.addHandler(logging.StreamHandler())
     logger.reset_format()
@@ -141,7 +154,7 @@ default_logger = get_logger()
 
 if __name__ == '__main__':
     # test functions
-    demo_logger = get_logger("My Logger")
+    demo_logger = get_logger()
     # recommend to use `ANSI Color` in VSCode
     demo_logger.add_log_file("demo.log")
     demo_logger.debug("default style of `debug` msg")
@@ -155,6 +168,7 @@ if __name__ == '__main__':
     demo_logger.debug("this message cannot be displayed")
     demo_logger.prank(f"`prank` and `prank_root` behaves simalr with `debug` and `debug_root`, but `prank*` have highest priority(999)")
 
+    print(f"set level to debug")
     demo_logger.setLevel(demo_logger.DEBUG)
     for rank in range(8):
         demo_logger.set_rank(rank)
