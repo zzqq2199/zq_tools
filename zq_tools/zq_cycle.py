@@ -19,6 +19,9 @@ class Cycle:
 
     def __delitem__(self, index):
         raise Exception("Cycle not support delete single item")
+
+    def __repr__(self):
+        return f'Cycle[{", ".join([str(v) for v in self.datas])}]'
     
 if __name__ == '__main__':
     c = Cycle([1,2,3,4,5,6,7])
@@ -27,3 +30,4 @@ if __name__ == '__main__':
     for v in c:
         print(v)
     print(f"len(c)={len(c)}")
+    print(c)
