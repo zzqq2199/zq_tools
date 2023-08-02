@@ -31,15 +31,31 @@ class ZQ_Logger(logging.Logger):
         self.print_thread = False
         self.print_level = True
         self.rank = 0
-        self.log_files = dict()
+        self.name2handler = dict()
+        logging.Logger.setLevel(self, logging.DEBUG)
+
         
-    def add_log_file(self, log_file:str):
-        # file handler follows same level control behavior as console handler
-        if log_file in self.log_files: return
+    def add_log_file(self, log_file:str, name:str=""):
+        if not name: name = log_file
+        if name in self.name2handler: return
         handler = logging.FileHandler(log_file)
-        self.log_files[log_file] = handler
+        self.name2handler[name] = handler
         self.addHandler(handler)
         self.reset_format()
+
+    def set_level_for_handler(self, name:str, level:int):
+        if name not in self.name2handler: return
+        handler: logging.Handler = self.name2handler[name]
+        handler.setLevel(level)
+        
+    def set_level_for_all(self, level:int):
+        for name in self.name2handler:
+            handler: logging.Handler = self.name2handler[name]
+            handler.setLevel(level)
+    
+    def setLevel(self, *args, **kwargs):
+        print(f"Warn: `setLevel` is not supported, use `set_level_for_all` instead")
+        
         
         
     def generate_fmt(self)->logging.StreamHandler:
@@ -126,6 +142,7 @@ class ZQ_Logger(logging.Logger):
     
 def get_level_from_env(logger_name:str, default_level="info"):
     level = default_level if logger_name not in os.environ else os.environ[logger_name]
+    level = level.lower()
     level2num = {
         "debug": logging.DEBUG,
         "info": logging.INFO,
@@ -140,19 +157,21 @@ def get_level_from_env(logger_name:str, default_level="info"):
     return level2num[default_level]
 
     
-    
 
 def get_logger(logger_name="Z_LEVEL",
                enable_console = True)->ZQ_Logger:
     if logger_name in allocated_loggers: return allocated_loggers[logger_name]
     # why need to call `setLoggerClass` twice? refer to the issue: https://bugs.python.org/issue37258
     logging.setLoggerClass(ZQ_Logger)
-    logger = logging.getLogger(logger_name)
+    logger:ZQ_Logger = logging.getLogger(logger_name)
     logging.setLoggerClass(logging.Logger)
     # Initilize level from environment. If not specified, use INFO
-    logger.setLevel(get_level_from_env(logger_name))
     if enable_console:
-        logger.addHandler(logging.StreamHandler())
+        streamHandler = logging.StreamHandler()
+        name = logger_name
+        logger.name2handler[name] = streamHandler
+        streamHandler.setLevel(get_level_from_env(logger_name))
+        logger.addHandler(streamHandler)
     logger.reset_format()
     allocated_loggers[logger_name] = logger
     return logger
@@ -165,8 +184,8 @@ if __name__ == '__main__':
         print(f'{"="*20} test environ {"="*20}')
         logger1 = get_logger("logger1")
         logger1.debug("this message should not be printed due to default initilizing level is INFO")
-        logger1.setLevel(logger1.DEBUG)
-        logger1.debug("this message should be printed due to call `setLevel`")
+        logger1.set_level_for_all(logger1.DEBUG)
+        logger1.debug("this message should be printed due to call `set_level_for_all`")
         os.environ['logger2'] = "debug"
         logger2 = get_logger("logger2")
         logger2.debug("this message should be printed due to env `logger` is set to `debug`")
@@ -176,12 +195,12 @@ if __name__ == '__main__':
         # recommend to use `ANSI Color` extention to view log file in VSCode
         logger = get_logger("test_log_file")
         logger.add_log_file("demo.log")
-        logger.info(f"this message should be printed to both console and file {logger.log_files}")
+        logger.info(f"this message should be printed to both console and file {logger.name2handler.keys()}")
         
     def test_ranks():
         print(f'{"="*20} test ranks {"="*20}')
         logger=get_logger("test_ranks")
-        logger.setLevel(logger.DEBUG)
+        logger.set_level_for_handler("test_ranks", logger.DEBUG)
         logger.debug_root("printed due to default rank is 0 and default style is plain")
         logger.debug_root("NOT printed due to default rank is 0", root=2)
         for rank in range(8):
