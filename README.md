@@ -12,7 +12,9 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
-- 1.0.2: Fine grained control of different handlers
+- 1.0.4: fix errors in logger.debug 
+- 1.0.3: make logger.debug to print without any color.
+- 1.0.2: fine grained control of different handlers
 - 0.9.9: add `__repr__` for zq_cycle
 - 0.9.8: support `from zq_tools import logger` as well as `from zq_tools.zq_logger import default_logger as logger` for shorter code
 - 0.9.7: fix `setLevel` bug in zq_logger; use env value to initilize ZQ_Logger's controlling level

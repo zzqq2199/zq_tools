@@ -96,11 +96,13 @@ class ZQ_Logger(logging.Logger):
         if not self.isEnabledFor(self.PRANK): return
         color = getattr(cf, color) if color else self.default_color
         self._log(self.PRANK, color(msg), args, **kwargs)
-    def debug(self, msg:str, color:str='',*args, **kwargs):
-        '''print with rank. If color is not specified, use the color format corresponding to the rank'''
-        if not self.isEnabledFor(self.DEBUG): return
-        color = getattr(cf, color) if color else self.default_color
-        self._log(self.DEBUG, color(msg), args, **kwargs)
+    # def debug(self, msg:str, color:str='',*args, **kwargs):
+    #     '''print with rank. If color is not specified, use the color format corresponding to the rank'''
+    #     if not self.isEnabledFor(self.DEBUG): return
+    #     color = getattr(cf, color) if color else self.default_color
+    #     self._log(self.DEBUG, color(msg), args, **kwargs)
+    def debug(self, msg:str, *args, **kwargs):
+        if self.isEnabledFor(logging.INFO): self._log(logging.DEBUG, msg, args, kwargs)
     def info(self, msg:str, *args, **kwargs):
         if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, kwargs)
     def warn(self, msg:str, *args, **kwargs):
