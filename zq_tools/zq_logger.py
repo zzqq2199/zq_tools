@@ -102,15 +102,15 @@ class ZQ_Logger(logging.Logger):
     #     color = getattr(cf, color) if color else self.default_color
     #     self._log(self.DEBUG, color(msg), args, **kwargs)
     def debug(self, msg:str, *args, **kwargs):
-        if self.isEnabledFor(logging.INFO): self._log(logging.DEBUG, msg, args, kwargs)
+        if self.isEnabledFor(logging.INFO): self._log(logging.DEBUG, msg, args, **kwargs)
     def info(self, msg:str, *args, **kwargs):
-        if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, kwargs)
+        if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, **kwargs)
     def warn(self, msg:str, *args, **kwargs):
-        if self.isEnabledFor(logging.WARN): self._log(logging.WARN, cf.yellow(msg), args, kwargs)
+        if self.isEnabledFor(logging.WARN): self._log(logging.WARN, cf.yellow(msg), args, **kwargs)
     def error(self, msg:str, *args, **kwargs):
-        if self.isEnabledFor(logging.ERROR): self._log(logging.ERROR, cf.red(msg), args, kwargs)
+        if self.isEnabledFor(logging.ERROR): self._log(logging.ERROR, cf.red(msg), args, **kwargs)
     def fatal(self, msg:str, *args, **kwargs):
-        if self.isEnabledFor(logging.FATAL): self._log(logging.FATAL, cf.bold_red(msg), args, kwargs)
+        if self.isEnabledFor(logging.FATAL): self._log(logging.FATAL, cf.bold_red(msg), args, **kwargs)
 
     def prank_root(self, msg:str, color:str='', root=0, *args, **kwargs):
         '''print with rank. If color is not specified, use the color format corresponding to the rank'''
@@ -126,16 +126,16 @@ class ZQ_Logger(logging.Logger):
         self._log(self.DEBUG, color(msg), args, **kwargs)
     def info_root(self, msg:str, root=0, *args, **kwargs):
         if self.rank != root: return
-        if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, kwargs)
+        if self.isEnabledFor(logging.INFO): self._log(logging.INFO, cf.green(msg), args, **kwargs)
     def warn_root(self, msg:str, root=0, *args, **kwargs):
         if self.rank != root: return
-        if self.isEnabledFor(logging.WARN): self._log(logging.WARN, cf.yellow(msg), args, kwargs)
+        if self.isEnabledFor(logging.WARN): self._log(logging.WARN, cf.yellow(msg), args, **kwargs)
     def error_root(self, msg:str, root=0, *args, **kwargs):
         if self.rank != root: return
-        if self.isEnabledFor(logging.ERROR): self._log(logging.ERROR, cf.red(msg), args, kwargs)
+        if self.isEnabledFor(logging.ERROR): self._log(logging.ERROR, cf.red(msg), args, **kwargs)
     def fatal_root(self, msg:str, root=0, *args, **kwargs):
         if self.rank != root: return
-        if self.isEnabledFor(logging.FATAL): self._log(logging.FATAL, cf.bold_red(msg), args, kwargs)
+        if self.isEnabledFor(logging.FATAL): self._log(logging.FATAL, cf.bold_red(msg), args, **kwargs)
         
     warning = warn
     critical = fatal
