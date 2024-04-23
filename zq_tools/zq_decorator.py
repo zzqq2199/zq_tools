@@ -121,7 +121,7 @@ if __name__ == '__main__':
         print("hello in `with`")
 
     from zq_tools.zq_logger import default_logger as logger
-    with time_it(keyword="time it as context manager", print_it=logger.info):
+    with time_it(keyword="time it as context manager", print_it=lambda x:logger.info(x)):
         print("hello in `with`, print with logger")
     
     
