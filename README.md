@@ -12,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 1.0.6: support zq_tracing.dump instantly
 - 1.0.5: fix bugs of `**kwargs` passing in `zq_logger`
 - 1.0.4: fix errors in logger.debug 
 - 1.0.3: make logger.debug to print without any color.

@@ -28,30 +28,54 @@ __all__ = [
 
 
 contents = []
-start_timestamp = 0
+START_TIMESTAMP = 0
 
-tracing_switch=True
+TRACING_SWITCH=True
+
+TRACING_STASH=True
+TRACING_LOGGER=None
+
 def enable_trace():
-    global tracing_switch
-    tracing_switch=True
+    global TRACING_SWITCH
+    TRACING_SWITCH=True
 def disable_trace():
-    global tracing_switch
-    tracing_switch=False
+    global TRACING_SWITCH
+    TRACING_SWITCH=False
 
 def should_trace(func):
     def inner(*args, **kwargs):
-        global tracing_switch
-        if tracing_switch:
+        global TRACING_SWITCH
+        if TRACING_SWITCH:
             return func(*args, **kwargs)
         else:
             return
     return inner
 
+def set_tracing_stash(tracing_stash=True, trace_file:str="trace.json", init_trace_file=True):
+    import logging
+    global TRACING_STASH, TRACING_LOGGER
+    TRACING_STASH = tracing_stash
+    if TRACING_STASH==False:
+        # init TRACING_LOGGER
+        TRACING_LOGGER = logging.getLogger("zq_tracing")
+        TRACING_LOGGER.setLevel(logging.FATAL)
+        file_handler = logging.FileHandler(trace_file)
+        TRACING_LOGGER.addHandler(file_handler)
+        if init_trace_file:
+            with open(trace_file, 'w') as f:
+                f.write("[\n")
+
+    
+def record_update(j:dict):
+    if TRACING_STASH:
+        contents.append(json.dumps(j))
+    else:
+        TRACING_LOGGER.fatal(json.dumps(j)+",")
 
 
 def set_start_timestamp():
-    global start_timestamp
-    start_timestamp = time.time()
+    global START_TIMESTAMP
+    START_TIMESTAMP = time.time()
 
 
 def get_pid():
@@ -68,11 +92,11 @@ def record_timestamp(name:str,
                  tid:int,
                  pid:int,
                  **kwargs) -> None:
-    global start_timestamp
+    global START_TIMESTAMP
     j = {
         "name":name,
         "cat":cat,
-        "ts": (time.time()-start_timestamp)*1000000,
+        "ts": (time.time()-START_TIMESTAMP)*1000000,
         "pid": get_pid() if pid<0 else pid,
         "tid": get_tid() if tid<0 else tid
     }
@@ -88,7 +112,7 @@ def record_begin(name:str,
                  **kwargs):
     j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = "B"
-    contents.append(json.dumps(j))
+    record_update(j)
 
 @should_trace
 def record_end(name:str,
@@ -98,7 +122,7 @@ def record_end(name:str,
                **kwargs):
     j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = "E"
-    contents.append(json.dumps(j))
+    record_update(j)
     
 @should_trace
 def record_begin_async(name:str,
@@ -111,7 +135,7 @@ def record_begin_async(name:str,
     j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = 'b'
     j['id'] = id
-    contents.append(json.dumps(j))
+    record_update(j)
     
 @should_trace
 def record_end_async(name:str,
@@ -124,7 +148,7 @@ def record_end_async(name:str,
     j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = 'e'
     j['id'] = id
-    contents.append(json.dumps(j))
+    record_update(j)
 
 @should_trace
 def record_duration(name:str,
@@ -136,7 +160,7 @@ def record_duration(name:str,
     j = record_timestamp(name, cat, tid, pid, **kwargs)
     j['ph'] = "X"
     j['dur'] = dur  
-    contents.append(json.dumps(j))
+    record_update(j)
     
 @should_trace
 def record_thread_name(name:str, tid=-1, pid=-1, **kwargs):
@@ -148,7 +172,7 @@ def record_thread_name(name:str, tid=-1, pid=-1, **kwargs):
     }
     kwargs['name'] = name
     j['args'] = kwargs
-    contents.append(json.dumps(j))
+    record_update(j)
 
 @should_trace
 def record_process_name(name:str, pid=-1, **kwargs):
@@ -159,7 +183,7 @@ def record_process_name(name:str, pid=-1, **kwargs):
     }
     kwargs['name'] = name
     j['args'] = kwargs
-    contents.append(json.dumps(j))
+    record_update(j)
     
 @should_trace
 def record_process_sort_index(index:int, pid=-1, **kwargs):
@@ -170,7 +194,7 @@ def record_process_sort_index(index:int, pid=-1, **kwargs):
     }
     kwargs['sort_index'] = index
     j['args'] = kwargs
-    contents.append(json.dumps(j))
+    record_update(j)
 
 @should_trace
 def record_thread_sort_index(index:int, tid=-1, pid=-1, **kwargs):
@@ -182,7 +206,7 @@ def record_thread_sort_index(index:int, tid=-1, pid=-1, **kwargs):
     }
     kwargs['sort_index'] = index
     j['args'] = kwargs
-    contents.append(json.dumps(j))
+    record_update(j)
 
 @should_trace
 def record_dump(filename:str):
@@ -207,12 +231,27 @@ def record_append(filename:str):
         
 if __name__ == '__main__':
     # disable_trace()
-    for i in range(2):
-        print(f"{i}")
-        record_begin(name=f"name_{i}", cat="")
-        time.sleep(1)
-        record_end(name=f"name_{i}", cat="")
-        time.sleep(0.5)
-    record_thread_name(name="thread")
-    record_process_name(name="process")
-    record_dump("./test.json")
+    def demo1():
+        for i in range(2):
+            print(f"{i}")
+            record_begin(name=f"name_{i}", cat="")
+            time.sleep(1)
+            record_end(name=f"name_{i}", cat="")
+            time.sleep(0.5)
+        record_thread_name(name="thread")
+        record_process_name(name="process")
+        record_dump("./test.json")
+    
+    def demo2():
+        set_tracing_stash(False, trace_file="demo2.json", init_trace_file=True)
+        # with open("demo2.json", 'w') as f: f.write("[\n")
+        for i in range(2):
+            print(f"{i}")
+            record_begin(name=f"name_{i}", cat="")
+            time.sleep(1)
+            record_end(name=f"name_{i}", cat="")
+            time.sleep(0.5)
+        record_thread_name(name="thread")
+        record_process_name(name="process")
+    
+    demo2()
