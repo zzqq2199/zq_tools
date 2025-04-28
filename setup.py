@@ -5,13 +5,13 @@ with open("README.md", 'r') as f:
 
 setuptools.setup(
     name="zq-tools",
-    version="1.0.6",
+    version="1.0.9",
     author="zzqq2199",
     author_email="zhouquanjs@qq.com",
     description="A collection of tools for zzqq2199",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=["zq_tools"],
+    packages=["zq_tools", "zq_tools/bogging"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -19,6 +19,7 @@ setuptools.setup(
     ],
     install_requires=[
         "colorlog >= 6.6",
-        "colorful"
+        "colorful",
+        "bogging"
     ]
 )

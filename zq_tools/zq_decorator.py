@@ -3,7 +3,7 @@ import sys
 import functools
 import inspect
 from typing import Any, Callable, TypeVar, cast
-from zq_tools.zq_logger import default_logger as logger
+from zq_tools.zq_bogger import default_bogger as bogger
 
 # Used for annotating the decorator usage of 'no_grad' and 'enable_grad'.
 # See https://mypy.readthedocs.io/en/latest/generics.html#declaring-decorators
@@ -120,9 +120,9 @@ if __name__ == '__main__':
     with time_it(keyword="time it as context manager"):
         print("hello in `with`")
 
-    from zq_tools.zq_logger import default_logger as logger
-    with time_it(keyword="time it as context manager", print_it=lambda x:logger.info(x)):
-        print("hello in `with`, print with logger")
+    from zq_tools.zq_bogger import default_bogger as bogger
+    with time_it(keyword="time it as context manager", print_it=lambda x:bogger.info(x)):
+        print("hello in `with`, print with bogger")
     
     
     

@@ -12,6 +12,9 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 1.0.9: use bogging, and alias logger to bogger if not defined yet.
+- 1.0.8: fix bug: add `bogging` 
+- 1.0.7: add `zq_bogger` to prevent logger conflicts
 - 1.0.6: support zq_tracing.dump instantly
 - 1.0.5: fix bugs of `**kwargs` passing in `zq_logger`
 - 1.0.4: fix errors in logger.debug 
