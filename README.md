@@ -12,6 +12,7 @@ help generate json file used in `chrome://tracing`
 
 
 # Release Notes
+- 1.1.0: change pattern of logging number of line
 - 1.0.9: use bogging, and alias logger to bogger if not defined yet.
 - 1.0.8: fix bug: add `bogging` 
 - 1.0.7: add `zq_bogger` to prevent logger conflicts

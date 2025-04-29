@@ -61,7 +61,7 @@ class ZQ_Bogger(bogging.Bogger):
     def generate_fmt(self)->bogging.StreamHandler:
         thread_fmt = "" if not self.print_thread else "[%(threadName)s] "
         level_fmt = "" if not self.print_level else " [%(levelname)s]"
-        basic_fmt = f'[%(asctime)s.%(msecs)03d] {thread_fmt}"%(pathname)s", line %(lineno)d{level_fmt}:{self.tag} %(message)s'
+        basic_fmt = f'[%(asctime)s.%(msecs)03d] {thread_fmt}"%(pathname)s:%(lineno)d":{self.tag} %(message)s'
         date_fmt = "%Y-%m-%d %H:%M:%S"
         fmt = bogging.Formatter(
             fmt = basic_fmt,
